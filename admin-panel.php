@@ -2,12 +2,24 @@
 require 'config.php';
 if (!isset($_SESSION['admin'])) { header("Location: login.php"); exit(); }
 
+if (!file_exists('uploads')) { mkdir('uploads', 0777, true); }
+
 if (isset($_POST['add_product'])) {
     $name = $conn->real_escape_string($_POST['name']);
     $desc = $conn->real_escape_string($_POST['description']);
     $price = $_POST['price'];
+    $discount = (int)$_POST['discount_percent'];
+    
+    $imagePath = "";
+    if (!empty($_FILES["image"]["name"])) {
+        $target = "uploads/" . time() . "_" . basename($_FILES["image"]["name"]);
+        if (move_uploaded_file($_FILES["image"]["tmp_name"], $target)) {
+            $imagePath = $target;
+        }
+    }
 
-    $conn->query("INSERT INTO products (name, description, price) VALUES ('$name', '$desc', '$price')");
+    $conn->query("INSERT INTO products (name, description, price, discount_percent, image) 
+                  VALUES ('$name', '$desc', '$price', '$discount', '$imagePath')");
 }
 ?>
 <!DOCTYPE html>
