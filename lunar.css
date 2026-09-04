@@ -8,3 +8,16 @@ body {
 }
 
 .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+/* Header & Nav */
+header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #eaeaea; margin-bottom: 40px; }
+.brand { font-size: 24px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; color: #000; }
+.nav-links a { margin-left: 20px; text-decoration: none; color: #555; font-size: 14px; text-transform: uppercase; }
+.nav-links a:hover { color: #000; }
+
+/* Buttons */
+.btn { background: #000; color: #fff; padding: 10px 20px; border: none; cursor: pointer; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; text-decoration: none; display: inline-block; transition: background 0.3s; }
+.btn:hover { background: #333; }
+.btn-danger { background: #d9534f; }
+.btn-danger:hover { background: #c9302c; }
+.btn-success { background: #5cb85c; }
