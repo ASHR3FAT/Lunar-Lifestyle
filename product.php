@@ -53,6 +53,19 @@ $sizes_res = $conn->query("SELECT size, quantity FROM product_sizes WHERE produc
 <body>
 <div class="container">
     <div class="single-product-wrapper">
+
+        <header>
+            <a href="index.php" class="brand">Lunar Lifestyle</a>
+            <div class="nav-links">
+                <a href="checkout.php">Cart (<?php echo $cart_count; ?>)</a>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <a href="account.php">My Account</a>
+                    <a href="logout.php">Logout</a>
+                <?php else: ?>
+                    <a href="login.php">Login</a>
+                <?php endif; ?>
+            </div>
+        </header>
         <h1><?php echo $product['name']; ?></h1>
         <p><?php echo $product['price']; ?> TK</p>
         <p><?php echo $product['description']; ?></p>
