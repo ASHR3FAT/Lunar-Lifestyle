@@ -21,10 +21,21 @@ $conn->query("CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255)
 )");
 
-// 2. Admin Table
+// 2. Admin Table & Default Admin Account
 $conn->query("CREATE TABLE IF NOT EXISTS admin (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) UNIQUE,
     password VARCHAR(255)
+)");
+$conn->query("INSERT IGNORE INTO admin (username, password) VALUES ('admin', 'admin123')");
+
+// 3. Products Table (Base product details)
+$conn->query("CREATE TABLE IF NOT EXISTS products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    description TEXT,
+    price DECIMAL(10,2),
+    discount_percent INT DEFAULT 0,
+    image VARCHAR(255)
 )");
 ?>
