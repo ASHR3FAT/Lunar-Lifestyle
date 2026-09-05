@@ -1,5 +1,13 @@
 <?php
 require 'config.php';
+
+if(isset($_POST['register'])){
+    $name = $conn->real_escape_string($_POST['name']);
+    $email = $conn->real_escape_string($_POST['email']);
+    $pass = $_POST['password'];
+    
+    $conn->query("INSERT INTO users(name,email,password) VALUES('$name','$email','$pass')");
+}
 ?>
 <!DOCTYPE html>
 <html>
