@@ -29,10 +29,24 @@ $user_id = $_SESSION['user_id'];
             <?php
             $res = $conn->query("SELECT * FROM orders WHERE user_id=$user_id ORDER BY created_at DESC");
             while ($row = $res->fetch_assoc()) {
+                
+                // Fetch specific items for this order
+                $order_id = $row['id'];
+                $items_res = $conn->query("SELECT oi.size, oi.qty, p.name FROM order_items oi LEFT JOIN products p ON oi.product_id = p.id WHERE oi.order_id = $order_id");
+                
+                $items_html = "";
+                while ($item = $items_res->fetch_assoc()) {
+                    $p_name = $item['name'] ? $item['name'] : 'Deleted Product';
+                    $items_html .= "<div style='margin-bottom: 8px;'>
+                                        <strong>{$p_name}</strong><br>
+                                        <small style='color: #666;'>Size: {$item['size']} | Qty: {$item['qty']}</small>
+                                    </div>";
+                }
+
                 echo "<tr>
                         <td>#{$row['id']}</td>
                         <td>{$row['created_at']}</td>
-                        <td>Pending fetch...</td>
+                        <td>{$items_html}</td>
                         <td style='font-weight: bold;'>{$row['total']} TK</td>
                         <td>{$row['status']}</td>
                       </tr>";
