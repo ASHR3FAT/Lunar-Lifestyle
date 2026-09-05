@@ -26,12 +26,31 @@ if (isset($_POST['edit_product'])) {
     $updateQuery .= " WHERE id=$id";
     $conn->query($updateQuery);
     
+    // Update Sizes
+    $sizes = ['S' => $_POST['qty_S'], 'M' => $_POST['qty_M'], 'L' => $_POST['qty_L'], 'XL' => $_POST['qty_XL']];
+    foreach($sizes as $sz => $qty) {
+        $qty = (int)$qty;
+        $chk = $conn->query("SELECT id FROM product_sizes WHERE product_id=$id AND size='$sz'");
+        if($chk->num_rows > 0) {
+            $conn->query("UPDATE product_sizes SET quantity=$qty WHERE product_id=$id AND size='$sz'");
+        } else {
+            $conn->query("INSERT INTO product_sizes (product_id, size, quantity) VALUES ($id, '$sz', $qty)");
+        }
+    }
+    
     header("Location: admin_panel.php");
     exit();
 }
 
 $product = $conn->query("SELECT * FROM products WHERE id=$id")->fetch_assoc();
 if(!$product) { die("Product not found."); }
+
+// Fetch current size quantities
+$sz_data = ['S'=>0, 'M'=>0, 'L'=>0, 'XL'=>0];
+$s_res = $conn->query("SELECT size, quantity FROM product_sizes WHERE product_id=$id");
+while($s = $s_res->fetch_assoc()) {
+    $sz_data[$s['size']] = $s['quantity'];
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -65,6 +84,14 @@ if(!$product) { die("Product not found."); }
                 <label>Discount %</label>
                 <input type="number" name="discount_percent" value="<?php echo $product['discount_percent']; ?>" min="0" max="100" required>
             </div>
+        </div>
+        
+        <label style="display:block; margin-top:15px; font-weight: 600; color:#333;">Update Stock Quantities by Size:</label>
+        <div style="display:flex; gap:10px; margin-bottom: 10px; background: #f9f9f9; padding: 10px; border: 1px solid #eee;">
+            <div style="flex:1;"><label style="font-size: 12px;">S</label><input type="number" name="qty_S" value="<?php echo $sz_data['S']; ?>" min="0"></div>
+            <div style="flex:1;"><label style="font-size: 12px;">M</label><input type="number" name="qty_M" value="<?php echo $sz_data['M']; ?>" min="0"></div>
+            <div style="flex:1;"><label style="font-size: 12px;">L</label><input type="number" name="qty_L" value="<?php echo $sz_data['L']; ?>" min="0"></div>
+            <div style="flex:1;"><label style="font-size: 12px;">XL</label><input type="number" name="qty_XL" value="<?php echo $sz_data['XL']; ?>" min="0"></div>
         </div>
         
         <label style="display:block; margin-top:15px;">Update Product Image (Leave blank to keep current):</label><br>

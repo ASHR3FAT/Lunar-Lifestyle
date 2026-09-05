@@ -189,7 +189,7 @@ if (isset($_GET['del_order'])) {
                         <td>{$p['price']} TK</td>
                         <td style='display: flex; gap: 8px; align-items: center;'>
                             <a href='edit_product.php?id={$p['id']}' class='btn' style='padding:5px 10px; font-size: 12px; background-color: #28a745; color: #fff; text-decoration: none; border-radius: 4px;'>Edit</a>
-                            <a href='?del_product={$p['id']}' class='btn btn-danger' style='padding:5px 10px; font-size: 12px;'>Delete</a>
+                            <a href='?del_product={$p['id']}' class='btn btn-danger' style='padding:5px 10px; font-size: 12px;' onclick=\"return confirm('Are you sure you want to delete this product?');\">Delete</a>
                         </td>
                       </tr>";
             }
