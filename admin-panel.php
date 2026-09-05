@@ -42,6 +42,22 @@ if (isset($_GET['del_product'])) {
     header("Location: admin_panel.php");
     exit();
 }
+
+// --- Update Order Status ---
+if (isset($_POST['update_order_status'])) {
+    $order_id = (int)$_POST['order_id'];
+    $status = $conn->real_escape_string($_POST['status']);
+    $conn->query("UPDATE orders SET status='$status' WHERE id=$order_id");
+}
+
+// --- Delete Order ---
+if (isset($_GET['del_order'])) {
+    $id = (int)$_GET['del_order'];
+    $conn->query("DELETE FROM orders WHERE id=$id");
+    $conn->query("DELETE FROM order_items WHERE order_id=$id"); // Clean up associated items
+    header("Location: admin_panel.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -81,6 +97,64 @@ if (isset($_GET['del_product'])) {
         <input type="file" name="image" accept="image/*" style="margin:10px 0;"><br>
         <button type="submit" name="add_product" class="btn">Upload Product</button>
     </form>
+
+    <hr style="border: 0; border-top: 1px solid #eaeaea; margin: 40px 0;">
+
+    <h2>Order Management</h2>
+    <div style="overflow-x: auto;">
+        <table>
+            <tr>
+                <th>Order #</th>
+                <th>Customer ID</th>
+                <th>Address</th>
+                <th>Items Ordered</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            <?php
+            $orders = $conn->query("SELECT * FROM orders ORDER BY created_at DESC");
+            while ($o = $orders->fetch_assoc()) {
+                
+                // Fetch specific items for this order
+                $o_id = $o['id'];
+                $items_res = $conn->query("SELECT oi.size, oi.qty, p.name FROM order_items oi LEFT JOIN products p ON oi.product_id = p.id WHERE oi.order_id = $o_id");
+                
+                $items_html = "";
+                while ($item = $items_res->fetch_assoc()) {
+                    $p_name = $item['name'] ? $item['name'] : 'Deleted Product';
+                    $items_html .= "<div style='margin-bottom: 8px; border-bottom: 1px dashed #ccc; padding-bottom: 5px;'>
+                                        <strong>{$p_name}</strong><br>
+                                        <span style='color: #444; font-size: 13px;'>Size: <b>{$item['size']}</b> | Qty: <b>{$item['qty']}</b></span>
+                                    </div>";
+                }
+
+                echo "<tr>
+                        <td><strong>#{$o['id']}</strong><br><small>{$o['created_at']}</small></td>
+                        <td>User #{$o['user_id']}</td>
+                        <td style='max-width: 200px;'>{$o['address']}</td>
+                        <td style='min-width: 250px;'>{$items_html}</td>
+                        <td style='font-weight: bold;'>{$o['total']} TK</td>
+                        <td>
+                            <form method='post' style='display:flex; gap: 5px;'>
+                                <input type='hidden' name='order_id' value='{$o['id']}'>
+                                <select name='status' style='padding:5px; border: 1px solid #ccc;'>
+                                    <option value='Pending' " . ($o['status']=='Pending'?'selected':'') . ">Pending</option>
+                                    <option value='Confirmed' " . ($o['status']=='Confirmed'?'selected':'') . ">Confirmed</option>
+                                    <option value='Shipped' " . ($o['status']=='Shipped'?'selected':'') . ">Shipped</option>
+                                    <option value='Delivered' " . ($o['status']=='Delivered'?'selected':'') . ">Delivered</option>
+                                </select>
+                                <button type='submit' name='update_order_status' class='btn' style='padding:5px 10px; font-size: 12px;'>Update</button>
+                            </form>
+                        </td>
+                        <td>
+                            <a href='?del_order={$o['id']}' class='btn btn-danger' style='padding:5px 10px; font-size: 12px;'>Delete</a>
+                        </td>
+                      </tr>";
+            }
+            ?>
+        </table>
+    </div>
 
     <hr style="border: 0; border-top: 1px solid #eaeaea; margin: 40px 0;">
 
