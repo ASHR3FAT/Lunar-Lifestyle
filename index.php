@@ -1,17 +1,28 @@
 <?php
 require 'config.php';
 
+// Handle Add to Cart directly from the homepage
 if (isset($_POST['add_to_cart'])) {
     $id = (int)$_POST['product_id'];
-    $size = $_POST['size'];
+    $size = isset($_POST['size']) ? $_POST['size'] : ''; // Fallback if size is missing
     
-    $cart_key = $id . '_' . $size;
-    $_SESSION['cart'][$cart_key] = ['id' => $id, 'size' => $size, 'qty' => 1];
+    // FIX: Initialize the cart session array if it doesn't exist
+    if (!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = [];
+    }
 
+    $cart_key = $id . '_' . $size; // Unique key for Product + Size combo
+    
+    if (!isset($_SESSION['cart'][$cart_key])) {
+        $_SESSION['cart'][$cart_key] = ['id' => $id, 'size' => $size, 'qty' => 1];
+    } else {
+        $_SESSION['cart'][$cart_key]['qty']++;
+    }
     header("Location: checkout.php");
     exit();
 }
 
+// FIX: Calculate total item quantity for the cart counter
 $cart_count = 0;
 if (isset($_SESSION['cart'])) {
     foreach ($_SESSION['cart'] as $item) {
@@ -25,6 +36,7 @@ if (isset($_SESSION['cart'])) {
     <title>LUNAR LIFESTYLE</title>
     <link rel="stylesheet" href="lunar.css">
     <style>
+        /* Quick style for the size dropdown on the homepage */
         .grid-size-select {
             width: 100%;
             padding: 8px;
@@ -52,6 +64,7 @@ if (isset($_SESSION['cart'])) {
 
     <div class="product-grid">
         <?php
+        // Fetch products that have at least one size in stock
         $result = $conn->query("SELECT p.*, SUM(ps.quantity) as total_qty 
                                 FROM products p 
                                 LEFT JOIN product_sizes ps ON p.id = ps.product_id 
@@ -62,6 +75,8 @@ if (isset($_SESSION['cart'])) {
             $sale_price = $row['price'] - ($row['price'] * $row['discount_percent'] / 100);
             
             echo "<div class='product-card'>";
+            
+            // CLICKABLE AREA (To go Details Page)
             echo "<a href='product.php?id={$row['id']}' style='text-decoration:none; display:block;'>";
             echo "<img src='{$img}' alt='{$row['name']}'>";
             echo "<div class='product-title'>{$row['name']}</div>";
@@ -73,9 +88,11 @@ if (isset($_SESSION['cart'])) {
             }
             echo "</a>";
 
+            // QUICK ADD TO CART FORM
             echo "<form method='post' action='index.php' style='margin-top: 15px;'>";
             echo "<input type='hidden' name='product_id' value='{$row['id']}'>";
             
+            // Fetch available sizes for this specific product
             $sizes_res = $conn->query("SELECT size, quantity FROM product_sizes WHERE product_id={$row['id']} AND quantity > 0");
             
             if ($sizes_res->num_rows > 0) {
