@@ -14,6 +14,15 @@ if (isset($_POST['edit_product'])) {
     
     // Base update query
     $updateQuery = "UPDATE products SET name='$name', description='$desc', price='$price', discount_percent='$discount'";
+    
+    if (!empty($_FILES["image"]["name"])) {
+        if (!file_exists('uploads')) { mkdir('uploads', 0777, true); }
+        $target = "uploads/" . time() . "_" . basename($_FILES["image"]["name"]);
+        if (move_uploaded_file($_FILES["image"]["tmp_name"], $target)) {
+            $updateQuery .= ", image='$target'";
+        }
+    }
+    
     $updateQuery .= " WHERE id=$id";
     $conn->query($updateQuery);
     
@@ -57,6 +66,12 @@ if(!$product) { die("Product not found."); }
                 <input type="number" name="discount_percent" value="<?php echo $product['discount_percent']; ?>" min="0" max="100" required>
             </div>
         </div>
+        
+        <label style="display:block; margin-top:15px;">Update Product Image (Leave blank to keep current):</label><br>
+        <?php if($product['image']): ?>
+            <img src="<?php echo $product['image']; ?>" height="100" style="margin: 10px 0; border: 1px solid #ccc;"><br>
+        <?php endif; ?>
+        <input type="file" name="image" accept="image/*" style="margin:10px 0;"><br>
         
         <button type="submit" name="edit_product" class="btn btn-success" style="margin-top: 10px;">Save Changes</button>
     </form>
