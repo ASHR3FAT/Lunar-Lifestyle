@@ -34,21 +34,26 @@ if(isset($_POST['login'])){
 <html>
 <head>
     <title>Login - LUNAR LIFESTYLE</title>
+    <link rel="stylesheet" href="lunar.css">
 </head>
-<body>
-<div>
-    <h2>Lunar Lifestyle Login</h2>
+<body style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+<div style="background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 400px;">
+    <h2 style="text-align: center; margin-bottom: 20px;">Lunar Lifestyle Login</h2>
     
-    <?php if(isset($error)) echo "<p>$error</p>"; ?>
+    <?php if(isset($error)) echo "<p style='color: #d9534f; background: #fdf2f2; padding: 10px; border-radius: 4px; text-align:center; font-size: 14px;'>$error</p>"; ?>
     
     <form method="post" action="login.php">
         <label for="login_id">Email or Username</label>
         <input type="text" id="login_id" name="login_id" placeholder="Enter email or admin username" required>
         
         <label for="password">Password</label>
-        <input type="password" id="password" name="password" required>
+        <input type="password" id="password" name="password" placeholder="Enter password" required>
         
-        <button type="submit" name="login">Login</button>
+        <button type="submit" name="login" class="btn" style="margin-top: 15px; width: 100%;">Login</button>
+        
+        <div style="text-align: center; margin-top: 20px; font-size: 14px;">
+            Don't have an account? <a href="register.php" style="color: #4f46e5; text-decoration: none; font-weight: 600;">Register here</a>
+        </div>
     </form>
 </div>
 </body>
