@@ -38,4 +38,11 @@ $conn->query("CREATE TABLE IF NOT EXISTS products (
     discount_percent INT DEFAULT 0,
     image VARCHAR(255)
 )");
+// 4. Product Sizes Table (Manages stock for individual sizes)
+$conn->query("CREATE TABLE IF NOT EXISTS product_sizes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT,
+    size VARCHAR(50),
+    quantity INT DEFAULT 0
+)");
 ?>
