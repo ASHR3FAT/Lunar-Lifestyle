@@ -1,11 +1,33 @@
 <?php
 require 'config.php';
+
+// Handle Add to Cart directly from the homepage
+if (isset($_POST['add_to_cart'])) {
+    $id = (int)$_POST['product_id'];
+    $size = $_POST['size'];
+    
+    $cart_key = $id . '_' . $size;
+    $_SESSION['cart'][$cart_key] = ['id' => $id, 'size' => $size, 'qty' => 1];
+
+    header("Location: checkout.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html>
 <head>
     <title>LUNAR LIFESTYLE</title>
     <link rel="stylesheet" href="lunar.css">
+    <style>
+        .grid-size-select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9f9;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -18,7 +40,11 @@ require 'config.php';
 
     <div class="product-grid">
         <?php
-        $result = $conn->query("SELECT * FROM products");
+        $result = $conn->query("SELECT p.*, SUM(ps.quantity) as total_qty 
+                                FROM products p 
+                                LEFT JOIN product_sizes ps ON p.id = ps.product_id 
+                                GROUP BY p.id HAVING total_qty > 0 OR total_qty IS NULL");
+                                
         while ($row = $result->fetch_assoc()) {
             $img = !empty($row['image']) ? $row['image'] : 'https://placehold.co/400x500?text=No+Image';
             $sale_price = $row['price'] - ($row['price'] * $row['discount_percent'] / 100);
@@ -34,6 +60,25 @@ require 'config.php';
                 echo "<div class='product-price' style='font-weight:bold; color:#000;'>{$row['price']} TK</div>";
             }
             echo "</a>";
+
+            echo "<form method='post' action='index.php' style='margin-top: 15px;'>";
+            echo "<input type='hidden' name='product_id' value='{$row['id']}'>";
+            
+            $sizes_res = $conn->query("SELECT size, quantity FROM product_sizes WHERE product_id={$row['id']} AND quantity > 0");
+            
+            if ($sizes_res->num_rows > 0) {
+                echo "<select name='size' class='grid-size-select' required>";
+                echo "<option value='' disabled selected>Select Size</option>";
+                while ($sz = $sizes_res->fetch_assoc()) {
+                    echo "<option value='{$sz['size']}'>{$sz['size']} ({$sz['quantity']} left)</option>";
+                }
+                echo "</select>";
+                echo "<button type='submit' name='add_to_cart' class='btn' style='width: 100%;'>Add to Cart</button>";
+            } else {
+                echo "<p style='color: #e53e3e; font-weight: bold; margin-top: 10px;'>Out of Stock</p>";
+            }
+            echo "</form>";
+
             echo "</div>";
         }
         ?>
