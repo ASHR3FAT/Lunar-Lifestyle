@@ -56,4 +56,14 @@ $conn->query("CREATE TABLE IF NOT EXISTS orders (
     status VARCHAR(50) DEFAULT 'Pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )");
+
+// 6. Order Items Table (Includes specific size ordered)
+$conn->query("CREATE TABLE IF NOT EXISTS order_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT,
+    product_id INT,
+    size VARCHAR(50),
+    qty INT,
+    price DECIMAL(10,2)
+)");
 ?>
