@@ -1,7 +1,6 @@
 <?php
 require 'config.php';
 
-// Handle Add to Cart directly from the homepage
 if (isset($_POST['add_to_cart'])) {
     $id = (int)$_POST['product_id'];
     $size = $_POST['size'];
@@ -11,6 +10,13 @@ if (isset($_POST['add_to_cart'])) {
 
     header("Location: checkout.php");
     exit();
+}
+
+$cart_count = 0;
+if (isset($_SESSION['cart'])) {
+    foreach ($_SESSION['cart'] as $item) {
+        $cart_count += $item['qty'];
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -34,7 +40,13 @@ if (isset($_POST['add_to_cart'])) {
     <header>
         <a href="index.php" class="brand">Lunar Lifestyle</a>
         <div class="nav-links">
-            <a href="checkout.php">Cart</a>
+            <a href="checkout.php">Cart (<?php echo $cart_count; ?>)</a>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="account.php">My Account</a>
+                <a href="logout.php">Logout</a>
+            <?php else: ?>
+                <a href="login.php">Login</a>
+            <?php endif; ?>
         </div>
     </header>
 
