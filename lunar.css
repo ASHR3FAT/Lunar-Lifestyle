@@ -27,3 +27,16 @@ input[type="text"], input[type="number"], input[type="password"], input[type="em
 table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; }
 th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eaeaea; }
 th { font-weight: 600; text-transform: uppercase; font-size: 12px; color: #666; }
+
+/* Product Grid */
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; }
+.product-card { background: #fff; padding: 15px; text-align: center; border: 1px solid #eaeaea; transition: 0.3s; }
+.product-card:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+.product-card img { max-width: 100%; height: 300px; object-fit: cover; margin-bottom: 15px; }
+.product-title { font-weight: 600; margin-bottom: 5px; color: #000; text-decoration: none; display: block; }
+.product-price { margin-bottom: 15px; }
+
+/* Details & Pricing */
+.sale-price { font-size: 18px; font-weight: bold; color: #e53e3e; }
+.original-price { text-decoration: line-through; color: #999; margin-right: 8px; font-size: 14px; }
+.discount-badge { background: #e53e3e; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; vertical-align: middle; margin-left: 5px; }
