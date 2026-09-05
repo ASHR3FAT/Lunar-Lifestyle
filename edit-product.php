@@ -5,6 +5,22 @@ if (!isset($_SESSION['admin'])) { header("Location: admin_login.php"); exit(); }
 if (!isset($_GET['id'])) { header("Location: admin_panel.php"); exit(); }
 $id = (int)$_GET['id'];
 
+// Handle the update request
+if (isset($_POST['edit_product'])) {
+    $name = $conn->real_escape_string($_POST['name']);
+    $desc = $conn->real_escape_string($_POST['description']);
+    $price = $_POST['price'];
+    $discount = (int)$_POST['discount_percent'];
+    
+    // Base update query
+    $updateQuery = "UPDATE products SET name='$name', description='$desc', price='$price', discount_percent='$discount'";
+    $updateQuery .= " WHERE id=$id";
+    $conn->query($updateQuery);
+    
+    header("Location: admin_panel.php");
+    exit();
+}
+
 $product = $conn->query("SELECT * FROM products WHERE id=$id")->fetch_assoc();
 if(!$product) { die("Product not found."); }
 ?>
