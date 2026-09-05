@@ -179,6 +179,13 @@ $sizes_res = $conn->query("SELECT size, quantity FROM product_sizes WHERE produc
             font-weight: bold;
             padding: 15px 0;
         }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .single-product-wrapper { gap: 30px; }
+            .prod-title { font-size: 28px; }
+            .add-btn, .select-size-dropdown { max-width: 100%; }
+        }
     </style>
 </head>
 <body>
