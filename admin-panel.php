@@ -1,15 +1,19 @@
 <?php
 require 'config.php';
+// Check if admin is logged in (using 'admin' session from your login.php)
 if (!isset($_SESSION['admin'])) { header("Location: login.php"); exit(); }
 
+// Create uploads directory if missing
 if (!file_exists('uploads')) { mkdir('uploads', 0777, true); }
 
+// Add Product & Initial Size
 if (isset($_POST['add_product'])) {
     $name = $conn->real_escape_string($_POST['name']);
     $desc = $conn->real_escape_string($_POST['description']);
     $price = $_POST['price'];
     $discount = (int)$_POST['discount_percent'];
     
+    // Image Upload
     $imagePath = "";
     if (!empty($_FILES["image"]["name"])) {
         $target = "uploads/" . time() . "_" . basename($_FILES["image"]["name"]);
@@ -20,6 +24,23 @@ if (isset($_POST['add_product'])) {
 
     $conn->query("INSERT INTO products (name, description, price, discount_percent, image) 
                   VALUES ('$name', '$desc', '$price', '$discount', '$imagePath')");
+    $pid = $conn->insert_id;
+    
+    // Insert Size Quantities
+    $sizes = ['S' => $_POST['qty_S'], 'M' => $_POST['qty_M'], 'L' => $_POST['qty_L'], 'XL' => $_POST['qty_XL']];
+    foreach($sizes as $sz => $qty) {
+        $qty = (int)$qty;
+        $conn->query("INSERT INTO product_sizes (product_id, size, quantity) VALUES ($pid, '$sz', $qty)");
+    }
+}
+
+// --- Delete Product ---
+if (isset($_GET['del_product'])) {
+    $id = (int)$_GET['del_product'];
+    $conn->query("DELETE FROM products WHERE id=$id");
+    $conn->query("DELETE FROM product_sizes WHERE product_id=$id"); // Clean up associated sizes
+    header("Location: admin_panel.php");
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -39,12 +60,69 @@ if (isset($_POST['add_product'])) {
     </header>
 
     <h2>Add New Product</h2>
-    <form method="post" style="background:#fff; padding:20px; border:1px solid #eaeaea;">
+    <form method="post" enctype="multipart/form-data" style="background:#fff; padding:20px; border:1px solid #eaeaea;">
         <input type="text" name="name" placeholder="Product Name" required>
         <textarea name="description" placeholder="Description" rows="3"></textarea>
-        <input type="number" name="price" placeholder="Base Price (TK)" required>
+        
+        <div style="display: flex; gap: 10px;">
+            <input type="number" name="price" placeholder="Base Price (TK)" required>
+            <input type="number" name="discount_percent" placeholder="Discount % (e.g. 10 for 10% off)" value="0" min="0" max="100" required>
+        </div>
+        
+        <label style="display:block; margin-top:15px; font-weight: 600; color:#333;">Stock Quantities by Size:</label>
+        <div style="display:flex; gap:10px; margin-bottom: 10px; background: #f9f9f9; padding: 10px; border: 1px solid #eee;">
+            <input type="number" name="qty_S" placeholder="Size S Qty" value="0" min="0">
+            <input type="number" name="qty_M" placeholder="Size M Qty" value="0" min="0">
+            <input type="number" name="qty_L" placeholder="Size L Qty" value="0" min="0">
+            <input type="number" name="qty_XL" placeholder="Size XL Qty" value="0" min="0">
+        </div>
+
+        <label style="display:block; margin-top:10px;">Product Image:</label>
+        <input type="file" name="image" accept="image/*" style="margin:10px 0;"><br>
         <button type="submit" name="add_product" class="btn">Upload Product</button>
     </form>
+
+    <hr style="border: 0; border-top: 1px solid #eaeaea; margin: 40px 0;">
+
+    <h2>Inventory</h2>
+    <div style="overflow-x: auto;">
+        <table>
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Available Sizes & Stock</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+            <?php
+            $prods = $conn->query("SELECT * FROM products ORDER BY id DESC");
+            while ($p = $prods->fetch_assoc()) {
+                $img = $p['image'] ? "<img src='{$p['image']}' height='60' style='border-radius:4px; object-fit:cover; width:60px;'>" : "No Img";
+                
+                // Fetch sizes for this product
+                $p_id = $p['id'];
+                $sizes_res = $conn->query("SELECT * FROM product_sizes WHERE product_id = $p_id");
+                $sizes_html = "";
+                while($sz = $sizes_res->fetch_assoc()){
+                     $sizes_html .= "<span style='display:inline-block; background:#eee; padding:3px 8px; border-radius:12px; margin:2px; font-size:12px;'>Size {$sz['size']}: <b>{$sz['quantity']}</b></span>";
+                }
+                if(empty($sizes_html)) $sizes_html = "<span style='color:red;'>Out of stock / No sizes</span>";
+
+                echo "<tr>
+                        <td>{$img}</td>
+                        <td style='font-weight: 500;'>{$p['name']}</td>
+                        <td>{$sizes_html}</td>
+                        <td>{$p['price']} TK</td>
+                        <td style='display: flex; gap: 8px; align-items: center;'>
+                            <a href='edit_product.php?id={$p['id']}' class='btn' style='padding:5px 10px; font-size: 12px; background-color: #28a745; color: #fff; text-decoration: none; border-radius: 4px;'>Edit</a>
+                            <a href='?del_product={$p['id']}' class='btn btn-danger' style='padding:5px 10px; font-size: 12px;'>Delete</a>
+                        </td>
+                      </tr>";
+            }
+            ?>
+        </table>
+    </div>
+
 </div>
 </body>
 </html>
