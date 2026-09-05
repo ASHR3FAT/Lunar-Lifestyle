@@ -7,6 +7,7 @@ if(isset($_POST['register'])){
     $pass = $_POST['password'];
     
     $conn->query("INSERT INTO users(name,email,password) VALUES('$name','$email','$pass')");
+    $message = "Registration Successful. <a href='login.php' style='color: #4f46e5;'>Login here</a>";
 }
 ?>
 <!DOCTYPE html>
@@ -18,6 +19,7 @@ if(isset($_POST['register'])){
 <body style="display: flex; justify-content: center; align-items: center; height: 100vh;">
 <div style="background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 400px;">
     <h2 style="text-align: center; margin-bottom: 20px;">Create Account</h2>
+    <?php if(isset($message)) echo "<p style='text-align:center; margin-bottom:15px;'>$message</p>"; ?>
     <form method="post">
         <label>Full Name</label>
         <input type="text" name="name" required>
