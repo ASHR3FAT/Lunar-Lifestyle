@@ -17,6 +17,7 @@ if (isset($_POST['place_order'])) {
     $address = $conn->real_escape_string($_POST['address']);
     $subtotal = 0;
 
+    // Calculate Subtotal First (with discounts applied)
     foreach ($_SESSION['cart'] as $key => $item) {
         $p = $conn->query("SELECT price, discount_percent FROM products WHERE id={$item['id']}")->fetch_assoc();
         $sale_price = $p['price'] - ($p['price'] * $p['discount_percent'] / 100);
@@ -27,10 +28,25 @@ if (isset($_POST['place_order'])) {
         $vat = $subtotal * 0.10;
         $final_total = $subtotal + $vat;
 
+        // Insert Order
         $conn->query("INSERT INTO orders (user_id, address, total) VALUES ($user_id, '$address', $final_total)");
+        $order_id = $conn->insert_id;
+
+        // Insert Order Items & Reduce Stock from the specific size!
+        foreach ($_SESSION['cart'] as $key => $item) {
+            $id = $item['id'];
+            $qty = $item['qty'];
+            $size = $item['size'];
+
+            $p = $conn->query("SELECT price, discount_percent FROM products WHERE id=$id")->fetch_assoc();
+            $sale_price = $p['price'] - ($p['price'] * $p['discount_percent'] / 100);
+            
+            $conn->query("INSERT INTO order_items (order_id, product_id, size, qty, price) VALUES ($order_id, $id, '$size', $qty, $sale_price)");
+            $conn->query("UPDATE product_sizes SET quantity = quantity - $qty WHERE product_id=$id AND size='$size'");
+        }
         
         unset($_SESSION['cart']);
-        echo "<script>alert('Order placed successfully!'); window.location='account.php';</script>";
+        echo "<script>alert('Order placed successfully! Cash on Delivery.'); window.location='account.php';</script>";
     }
 }
 ?>
