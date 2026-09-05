@@ -17,6 +17,29 @@ $user_id = $_SESSION['user_id'];
     </header>
 
     <h2>My Orders</h2>
+    <div style="overflow-x: auto;">
+        <table>
+            <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Items Ordered</th>
+                <th>Total</th>
+                <th>Status</th>
+            </tr>
+            <?php
+            $res = $conn->query("SELECT * FROM orders WHERE user_id=$user_id ORDER BY created_at DESC");
+            while ($row = $res->fetch_assoc()) {
+                echo "<tr>
+                        <td>#{$row['id']}</td>
+                        <td>{$row['created_at']}</td>
+                        <td>Pending fetch...</td>
+                        <td style='font-weight: bold;'>{$row['total']} TK</td>
+                        <td>{$row['status']}</td>
+                      </tr>";
+            }
+            ?>
+        </table>
+    </div>
 </div>
 </body>
 </html>
