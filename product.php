@@ -54,8 +54,132 @@ $sizes_res = $conn->query("SELECT size, quantity FROM product_sizes WHERE produc
 <!DOCTYPE html>
 <html>
 <head>
-    <title><?php echo $product['name']; ?></title>
+    <title><?php echo $product['name']; ?> - LUNAR LIFESTYLE</title>
     <link rel="stylesheet" href="lunar.css">
+    <style>
+        .single-product-wrapper {
+            display: flex;
+            gap: 60px;
+            margin-top: 40px;
+            margin-bottom: 80px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        
+        .product-image-col {
+            flex: 1;
+            min-width: 350px;
+            max-width: 550px;
+        }
+        
+        .product-image-col img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            object-fit: cover;
+        }
+
+        .product-info-col {
+            flex: 1;
+            min-width: 350px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .prod-title {
+            font-size: 36px;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+            color: #111;
+        }
+
+        .prod-price-box {
+            font-size: 24px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .prod-original-price {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 20px;
+        }
+
+        .prod-sale-price {
+            font-weight: 700;
+            color: #000;
+        }
+
+        .prod-discount-badge {
+            background-color: #e53e3e;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .prod-description {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .size-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .select-size-dropdown {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 25px;
+            background-color: #fcfcfc;
+            cursor: pointer;
+        }
+
+        .add-btn {
+            background-color: #000;
+            color: #fff;
+            padding: 18px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            max-width: 400px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            background-color: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .out-of-stock-msg {
+            color: #e53e3e;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 15px 0;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
