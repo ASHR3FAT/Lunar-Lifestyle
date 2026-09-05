@@ -42,12 +42,12 @@ if(isset($_POST['login'])){
     
     <?php if(isset($error)) echo "<p style='color: #d9534f; background: #fdf2f2; padding: 10px; border-radius: 4px; text-align:center; font-size: 14px;'>$error</p>"; ?>
     
-    <form method="post" action="login.php">
+    <form method="post" action="login.php" id="loginForm">
         <label for="login_id">Email or Username</label>
-        <input type="text" id="login_id" name="login_id" placeholder="Enter email or admin username" required>
+        <input type="text" id="login_id" name="login_id" placeholder="Enter email or admin username" required autocomplete="username">
         
         <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="Enter password" required>
+        <input type="password" id="password" name="password" placeholder="Enter password" required autocomplete="current-password">
         
         <button type="submit" name="login" class="btn" style="margin-top: 15px; width: 100%;">Login</button>
         

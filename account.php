@@ -29,6 +29,7 @@ $user_id = $_SESSION['user_id'];
             <?php
             $res = $conn->query("SELECT * FROM orders WHERE user_id=$user_id ORDER BY created_at DESC");
             while ($row = $res->fetch_assoc()) {
+                $badgeClass = $row['status'] == 'Confirmed' ? 'bg-confirmed' : 'bg-pending';
                 
                 // Fetch specific items for this order
                 $order_id = $row['id'];
@@ -48,7 +49,7 @@ $user_id = $_SESSION['user_id'];
                         <td>{$row['created_at']}</td>
                         <td>{$items_html}</td>
                         <td style='font-weight: bold;'>{$row['total']} TK</td>
-                        <td>{$row['status']}</td>
+                        <td><span class='badge {$badgeClass}'>{$row['status']}</span></td>
                       </tr>";
             }
             ?>
