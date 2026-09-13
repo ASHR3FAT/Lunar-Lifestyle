@@ -115,5 +115,5 @@
 <hr />
 
 <div align="center">
-  <p>Developed by <a href="https://github.com/ASHR3FAT">ASHR3FAT</a></p>
+  <p>Developed by <a href="https://github.com/ASHR3FAT">ASHR3FAT</a> * <a href="https://github.com/Ontor19">Ontor19</a> * <a href="https://github.com/kawsarrahman09">kawsarrahman09</a></p>
 </div>
